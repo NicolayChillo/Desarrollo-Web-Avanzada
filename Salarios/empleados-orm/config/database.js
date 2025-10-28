@@ -5,6 +5,7 @@ import dotenv from "dotenv";//trabaja coon las variables de entorno
 //cargar variables de .env
 
 dotenv.config();
+
 //crear conexion con db
 
 export const sequelize = new Sequelize(

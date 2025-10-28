@@ -13,7 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Ruta de prueba
+// Ruta raiz
 app.get("/", (_req, res) => res.send("Servidor de salarios funcionando correctamente"));
 
 // Registrar rutas
