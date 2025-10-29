@@ -43,19 +43,15 @@ export class Empleado extends Model {
 Empleado.init(
     {
         id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
+            type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true
         },
         nombre: {
-            type: DataTypes.STRING(80),
-            allowNull: false
+            type: DataTypes.STRING(80), allowNull: false
         },
         pago_hora: {
-            type: DataTypes.FLOAT,
-            allowNull: false
+            type: DataTypes.FLOAT, allowNull: false
         }
-        // ⚠️ NO tiene horas_trabajadas - se calcula dinámicamente desde RegistroHoras
+        //  NO tiene horas_trabajadas - se calcula dinámicamente desde RegistroHoras
     },
     {
         sequelize,
