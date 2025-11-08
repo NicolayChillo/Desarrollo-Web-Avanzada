@@ -1,0 +1,227 @@
+.App {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 18px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  color: #222;
+}
+
+h1 {
+  margin: 0 0 16px 0;
+  font-size: 28px;
+  color: #0b5ed7;
+}
+
+.estudiante-form,
+.estudiante-list,
+.estudiante-detalle,
+.nota-form {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 6px rgba(20,20,20,0.04);
+  margin-bottom: 16px;
+}
+
+form label {
+  display: block;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 4px;
+}
+
+button {
+  background: #0b5ed7;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+th {
+  font-size: 13px;
+  color: #555;
+}
+
+tr:hover td {
+  background: #fafafa;
+}
+
+.actions button {
+  margin-right: 6px;
+}
+
+.small {
+  font-size: 13px;
+  color: #666;
+}
+
+@media (min-width: 900px) {
+  .layout-columns {
+    display: grid;
+    /* dar más espacio a la columna derecha para las notas */
+    grid-template-columns: 1fr 620px;
+    gap: 20px;
+    align-items: start;
+  }
+  .layout-columns .left-column {
+    padding-right: 12px;
+  }
+  .layout-columns .right-column {
+    min-width: 560px;
+  }
+}
+
+/* mensaje de vacío */
+.empty {
+  color: #666;
+  font-size: 14px;
+}
+
+/* estilos para formularios de nota */
+.nota-form form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: end;
+}
+
+.nota-form label { font-size: 12px; }
+
+.estudiante-detalle {
+  margin-top: 8px;
+}
+
+.asignatura-list, .docente-list {
+  margin-top: 16px;
+}
+
+.actions button {
+  margin-right: 6px;
+  background: #e9ecef;
+  color: #222;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.actions button:hover { filter: brightness(0.98); }
+
+/* Botones reutilizables */
+.btn {
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-primary { background: #0b5ed7; color: #fff; }
+.btn-danger { background: #dc3545; color: #fff; }
+.btn-outline { background: transparent; border: 1px solid #ccc; color: #222; }
+
+/* Botones icono cuadrados */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 16px;
+}
+.icon-btn.btn-primary { background: #0b5ed7; color: #fff; }
+.icon-btn.btn-danger { background: #dc3545; color: #fff; }
+.icon-btn:hover { filter: brightness(0.95); }
+
+/* Acciones en la lista de estudiantes (alineadas horizontalmente) */
+.estudiante-list .actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* Acciones en las notas: columna estrecha con botones apilados */
+.notas-actions { display: flex; flex-direction: column; gap: 6px; align-items: center; width: 80px; }
+.notas-actions .btn { width: 56px; }
+
+/* Ajustes visuales para tarjetas a la derecha */
+.estudiante-detalle { position: relative; }
+.estudiante-detalle h2 { margin-bottom: 6px; }
+
+/* Mover ligeramente el formulario de nuevo estudiante hacia la derecha dentro de la columna izquierda */
+.left-column .estudiante-form { margin-left: 0; max-width: none; width: 100%; box-sizing: border-box; }
+
+/* Asegurar que el cuadro de detalle contenga todo el contenido y no se desborde */
+.estudiante-detalle {
+  position: relative;
+  overflow: hidden; /* evitar que elementos se salgan del contenedor */
+  padding: 18px 16px 20px 16px; /* más espacio interior */
+  min-height: 260px; /* dar altura para que no se vea tan comprimido */
+}
+
+/* Forzar que la tabla ajuste su tamaño dentro del card y que las celdas no saquen los botones */
+.estudiante-detalle table {
+  width: 100%;
+  table-layout: auto; /* permitir que columnas usen espacio disponible */
+}
+
+.estudiante-detalle th, .estudiante-detalle td {
+  padding: 12px 14px; /* aumentar espacio entre celdas */
+}
+
+.estudiante-detalle th:nth-last-child(1),
+.estudiante-detalle td:nth-last-child(1) {
+  width: 100px; /* columna de acciones con suficiente espacio */
+}
+
+.estudiante-detalle td { word-break: break-word; }
+
+/* Reducir tamaño de botones en la columna de acciones para que estén dentro del borde */
+.notas-actions { display: flex; flex-direction: column; gap: 8px; align-items: center; width: 96px; }
+.notas-actions .btn { width: 64px; padding: 8px 6px; font-size: 13px; }
+
+/* Alinear el área de acciones del estudiante (lista) con un máximo razonable */
+.estudiante-list .actions { max-width: 320px; }
+
+
+/* Reducir ligeramente el tamaño de fuente en listas y tablas (estudiantes, notas, asignaturas, docentes) */
+.estudiante-list,
+.estudiante-detalle,
+.asignatura-list,
+.docente-list,
+.estudiante-list table,
+.estudiante-detalle table,
+.asignatura-list table,
+.docente-list table {
+  font-size: 0.92rem; /* un poco más pequeño que el tamaño base */
+}
+
