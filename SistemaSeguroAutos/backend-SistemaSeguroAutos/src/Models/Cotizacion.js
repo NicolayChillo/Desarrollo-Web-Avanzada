@@ -49,12 +49,35 @@ export const Cotizacion = sequelize.define(
             defaultValue: 0
         },
         estado: {
-            type: DataTypes.ENUM("pendiente", "aprobada", "rechazada"),
-            allowNull: false
+            type: DataTypes.ENUM("pendiente", "aprobada", "rechazada", "vencida"),
+            allowNull: false,
+            defaultValue: "pendiente"
         },
         aceptaTerminos: {
             type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        formaPago: {
+            type: DataTypes.ENUM("tarjeta_credito", "tarjeta_debito"),
+            allowNull: true
+        },
+        pagoEnCuotas: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        numeroCuotas: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        fechaVencimiento: {
+            type: DataTypes.DATEONLY,
             allowNull: false
+        },
+        detalleCalculo: {
+            type: DataTypes.JSON,
+            allowNull: true
         }
     },
     {

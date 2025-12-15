@@ -44,11 +44,20 @@ export const crearCotizacion = async (req, res) => {
             costoFinal: resultado.datos.costoFinal,
             descuentos: resultado.datos.descuentoTotal ?? 0,
             recargos: resultado.datos.recargoTotal ?? 0,
-            estado: estadoFinal,
-            aceptaTerminos: req.body.aceptaTerminos ?? false
+            estado: resultado.datos.estado || estadoFinal,
+            aceptaTerminos: req.body.aceptaTerminos ?? false,
+            formaPago: req.body.formaPago || null,
+            pagoEnCuotas: req.body.pagoEnCuotas ?? false,
+            numeroCuotas: req.body.numeroCuotas || null,
+            fechaVencimiento: resultado.datos.fechaVencimiento,
+            detalleCalculo: resultado.datos
         });
 
-        res.status(201).json(nuevaCotizacion);
+        res.status(201).json({
+            mensaje: "Cotización creada exitosamente",
+            cotizacion: nuevaCotizacion,
+            detalles: resultado.datos
+        });
 
     } catch (error) {
         console.error("Error al crear cotización:", error);

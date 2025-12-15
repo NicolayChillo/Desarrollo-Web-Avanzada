@@ -21,6 +21,11 @@ export const Conductor = sequelize.define(
         fechaNacimiento: { 
             type: DataTypes.DATEONLY, 
             allowNull: false 
+        },
+        numeroAccidentes: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
         }
     },
     {

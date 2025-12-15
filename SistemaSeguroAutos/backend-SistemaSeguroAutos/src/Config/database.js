@@ -9,9 +9,10 @@ export const sequelize = new Sequelize(
     process.env.BD_PASSWORD,
     {
         host: process.env.BD_HOST,
-        port: process.env.BD_PORT || 3307,
+        port: process.env.BD_PORT || 3306,
         dialect: process.env.BD_DIALECT || "mysql",
         logging: false,
+        timezone: '-05:00'
     }
 );
 
@@ -19,8 +20,11 @@ export const sequelize = new Sequelize(
 export const dbConnection = async () => {
     try{
         await sequelize.authenticate();
-        console.log("Conexion a MYSQL exitosa");
+        console.log(" Conexión a MYSQL exitosa");
+   
     }catch(err){
-        console.error("No se pudo conectar a MYSQL:", err.message);
+        console.error("❌ No se pudo conectar a MYSQL");
+        console.error("Error:", err.message);
+
     }
 }

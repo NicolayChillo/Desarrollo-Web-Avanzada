@@ -1,0 +1,82 @@
+[
+    {
+        "nombre": "Juan Carlos Pérez",
+        "edad": 22,
+        "licencia": "LIC-001-2024",
+        "accidentes": 0,
+        "email": "juan.perez@email.com",
+        "telefono": "0987654321"
+    },
+    {
+        "nombre": "María González López",
+        "edad": 45,
+        "licencia": "LIC-002-2024",
+        "accidentes": 1,
+        "email": "maria.gonzalez@email.com",
+        "telefono": "0991234567"
+    },
+    {
+        "nombre": "Pedro Ramírez",
+        "edad": 68,
+        "licencia": "LIC-003-2024",
+        "accidentes": 0,
+        "email": "pedro.ramirez@email.com",
+        "telefono": "0998765432"
+    },
+    {
+        "nombre": "Ana Morales",
+        "edad": 19,
+        "licencia": "LIC-004-2024",
+        "accidentes": 2,
+        "email": "ana.morales@email.com",
+        "telefono": "0995555555"
+    },
+    {
+        "nombre": "Carlos Fernández",
+        "edad": 55,
+        "licencia": "LIC-005-2024",
+        "accidentes": 3,
+        "email": "carlos.fernandez@email.com",
+        "telefono": "0992222222"
+    },
+    {
+        "nombre": "Luisa Gómez",
+        "edad": 29,
+        "licencia": "LIC-12345",
+        "accidentes": 0,
+        "email": "luisa.gomez@email.com",
+        "telefono": "0993333333"
+    },
+    {
+        "nombre": "Roberto Silva",
+        "edad": 72,
+        "licencia": "LIC-006-2024",
+        "accidentes": 1,
+        "email": "roberto.silva@email.com",
+        "telefono": "0994444444"
+    },
+    {
+        "nombre": "Diana Torres",
+        "edad": 35,
+        "licencia": "LIC-007-2024",
+        "accidentes": 0,
+        "email": "diana.torres@email.com",
+        "telefono": "0996666666"
+    },
+    {
+        "nombre": "Miguel Ángel Castro",
+        "edad": 24,
+        "licencia": "LIC-008-2024",
+        "accidentes": 4,
+        "email": "miguel.castro@email.com",
+        "telefono": "0997777777"
+    },
+    {
+        "nombre": "Elena Vargas",
+        "edad": 60,
+        "licencia": "LIC-009-2024",
+        "accidentes": 0,
+        "email": "elena.vargas@email.com",
+        "telefono": "0998888888"
+    }
+]

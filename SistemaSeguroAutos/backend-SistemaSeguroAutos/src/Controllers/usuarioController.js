@@ -70,11 +70,11 @@ export const actualizarUsuario = async (req, res) => {
             });
         }
 
-        const { nombreUsuario, email, password } = req.body;
+        const { nombreUsuario, email, password, fotoPerfil } = req.body;
         
-        if (nombreUsuario == null && email == null && password == null) {
+        if (nombreUsuario == null && email == null && password == null && fotoPerfil == null) {
             return res.status(400).json({
-                mensaje: "Ingresar nombre de usuario, email y/o contraseña"
+                mensaje: "Ingresar al menos un campo para actualizar"
             });
         }
 
@@ -91,6 +91,7 @@ export const actualizarUsuario = async (req, res) => {
         if (nombreUsuario != null) usuario.nombreUsuario = nombreUsuario;
         if (email != null) usuario.email = email;
         if (password != null) usuario.password = password;
+        if (fotoPerfil != null) usuario.fotoPerfil = fotoPerfil;
 
         await usuario.save();
         res.status(200).json(usuario);
@@ -115,5 +116,48 @@ export const eliminarUsuario = async (req, res) => {
     } catch (error) {
         console.error("Error al eliminar usuario:", error);
         res.status(500).json({ mensaje: "Error al eliminar usuario", error: error.message });
+    }
+};
+
+// login de usuario
+export const loginUsuario = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                mensaje: "Email y contraseña son obligatorios"
+            });
+        }
+
+        // Buscar usuario por email
+        const usuario = await Usuario.findOne({ where: { email } });
+
+        if (!usuario) {
+            return res.status(401).json({
+                mensaje: "Credenciales incorrectas"
+            });
+        }
+
+        // Verificar contraseña (nota: en producción usa bcrypt)
+        if (usuario.password !== password) {
+            return res.status(401).json({
+                mensaje: "Credenciales incorrectas"
+            });
+        }
+
+        // Login exitoso
+        res.status(200).json({
+            mensaje: "Login exitoso",
+            usuario: {
+                id: usuario.id,
+                nombreUsuario: usuario.nombreUsuario,
+                email: usuario.email
+            }
+        });
+
+    } catch (error) {
+        console.error("Error al hacer login:", error);
+        res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
     }
 };
