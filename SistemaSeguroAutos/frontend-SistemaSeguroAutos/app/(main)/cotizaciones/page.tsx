@@ -83,39 +83,95 @@ const CotizacionesPage = () => {
 
     const accionesBodyTemplate = (rowData: Cotizacion) => {
         return (
-            <Button
-                icon="pi pi-eye"
-                label="Ver Detalles"
-                className="p-button-sm"
-                onClick={() => verDetalles(rowData)}
-            />
+            <div className="flex gap-2">
+                <Button
+                    icon="pi pi-eye"
+                    tooltip="Ver Detalles"
+                    className="p-button-sm p-button-info"
+                    onClick={() => verDetalles(rowData)}
+                />
+                {rowData.estado === 'pendiente' && (
+                    <>
+                        <Button
+                            icon="pi pi-check"
+                            tooltip="Aprobar"
+                            className="p-button-sm p-button-success"
+                            onClick={() => cambiarEstado(rowData.idCotizacion, 'aprobada')}
+                        />
+                        <Button
+                            icon="pi pi-times"
+                            tooltip="Rechazar"
+                            className="p-button-sm p-button-danger"
+                            onClick={() => cambiarEstado(rowData.idCotizacion, 'rechazada')}
+                        />
+                    </>
+                )}
+            </div>
         );
     };
 
     const verDetalles = (cotizacion: Cotizacion) => {
+        console.log('Cotización completa:', cotizacion);
+        console.log('detalleCalculo:', cotizacion.detalleCalculo);
         setSelectedCotizacion(cotizacion);
         setDialogVisible(true);
+    };
+
+    const cambiarEstado = async (id: number, nuevoEstado: string) => {
+        try {
+            await cotizacionService.updateEstado(id, nuevoEstado);
+            toast.current?.show({ 
+                severity: 'success', 
+                summary: 'Éxito', 
+                detail: `Cotización ${nuevoEstado === 'aprobada' ? 'aprobada' : 'rechazada'} exitosamente`, 
+                life: 3000 
+            });
+            await cargarCotizaciones();
+            setDialogVisible(false);
+        } catch (error: any) {
+            toast.current?.show({ 
+                severity: 'error', 
+                summary: 'Error', 
+                detail: error.message, 
+                life: 3000 
+            });
+        }
     };
 
     const renderDetalleCalculo = () => {
         if (!selectedCotizacion?.detalleCalculo) return null;
 
-        const detalle = selectedCotizacion.detalleCalculo;
+        // Si detalleCalculo es string, parsearlo
+        let detalle = selectedCotizacion.detalleCalculo;
+        if (typeof detalle === 'string') {
+            try {
+                detalle = JSON.parse(detalle);
+            } catch (e) {
+                console.error('Error parsing detalleCalculo:', e);
+                return <p>Error al cargar detalles de cálculo</p>;
+            }
+        }
+        
+        // Función helper para formatear valores que pueden venir como string o número
+        const formatValue = (value: any) => {
+            const num = typeof value === 'string' ? parseFloat(value) : value;
+            return isNaN(num) ? 0 : num;
+        };
 
         return (
             <div className="grid">
                 <div className="col-12">
-                    <h3>💰 Costos</h3>
+                    <h3>Costos</h3>
                     <ul className="list-none p-0">
-                        <li className="mb-2"><strong>Costo Base:</strong> {formatCurrency(detalle.costoBase)}</li>
-                        <li className="mb-2"><strong>Recargos Totales:</strong> {formatCurrency(detalle.recargoTotal)}</li>
-                        <li className="mb-2"><strong>Descuentos Totales:</strong> {formatCurrency(detalle.descuentoTotal)}</li>
-                        <li className="mb-2 text-2xl"><strong>Costo Final:</strong> <span className="text-primary">{formatCurrency(detalle.costoFinal)}</span></li>
+                        <li className="mb-2"><strong>Costo Base:</strong> {formatCurrency(formatValue(detalle.costoBase))}</li>
+                        <li className="mb-2"><strong>Recargos Totales:</strong> {formatCurrency(formatValue(detalle.recargoTotal))}</li>
+                        <li className="mb-2"><strong>Descuentos Totales:</strong> {formatCurrency(formatValue(detalle.descuentoTotal))}</li>
+                        <li className="mb-2 text-2xl"><strong>Costo Final:</strong> <span className="text-primary">{formatCurrency(formatValue(detalle.costoFinal))}</span></li>
                     </ul>
                 </div>
 
                 <div className="col-12 md:col-6">
-                    <h3>👤 Ajustes por Conductor</h3>
+                    <h3>Ajustes por Conductor</h3>
                     <ul className="list-none p-0">
                         {detalle.detallesAjustes?.conductor?.recargoJoven && (
                             <li className="mb-2 text-orange-500">
@@ -139,15 +195,17 @@ const CotizacionesPage = () => {
                 </div>
 
                 <div className="col-12 md:col-6">
-                    <h3>🚗 Ajustes por Vehículo</h3>
+                    <h3>Ajustes por Vehículo</h3>
                     <ul className="list-none p-0">
                         <li className="mb-2">
-                            <strong>Tipo:</strong> {selectedCotizacion.vehiculo.tipo.toUpperCase()}
+                            <strong>Tipo:</strong> {selectedCotizacion.vehiculo?.tipo?.toUpperCase() || 'N/A'}
                         </li>
-                        <li className="mb-2">
-                            <strong>Antigüedad:</strong> {detalle.detallesAjustes?.vehiculo?.antiguedad}
-                        </li>
-                        {detalle.detallesAjustes?.vehiculo?.usoComercial !== "No aplica" && (
+                        {detalle.detallesAjustes?.vehiculo?.antiguedad && (
+                            <li className="mb-2">
+                                <strong>Antigüedad:</strong> {detalle.detallesAjustes.vehiculo.antiguedad}
+                            </li>
+                        )}
+                        {detalle.detallesAjustes?.vehiculo?.usoComercial && detalle.detallesAjustes.vehiculo.usoComercial !== "No aplica" && (
                             <li className="mb-2 text-orange-500">
                                 <i className="pi pi-exclamation-triangle mr-2"></i>
                                 <strong>Uso Comercial:</strong> {detalle.detallesAjustes.vehiculo.usoComercial}
@@ -157,7 +215,7 @@ const CotizacionesPage = () => {
                 </div>
 
                 <div className="col-12 md:col-6">
-                    <h3>💥 Historial de Accidentes</h3>
+                    <h3>Historial de Accidentes</h3>
                     <ul className="list-none p-0">
                         {detalle.detallesAjustes?.accidentes?.descuentoSinAccidentes && (
                             <li className="mb-2 text-green-500">
@@ -175,7 +233,7 @@ const CotizacionesPage = () => {
                 </div>
 
                 <div className="col-12 md:col-6">
-                    <h3>💳 Forma de Pago</h3>
+                    <h3>Forma de Pago</h3>
                     <ul className="list-none p-0">
                         {detalle.detallesAjustes?.pago?.descuentoAnual && (
                             <li className="mb-2 text-green-500">
@@ -198,7 +256,7 @@ const CotizacionesPage = () => {
                 </div>
 
                 <div className="col-12">
-                    <h3>📅 Vigencia</h3>
+                    <h3>Vigencia</h3>
                     <ul className="list-none p-0">
                         <li className="mb-2"><strong>Vigencia:</strong> {detalle.vigencia} días</li>
                         <li className="mb-2"><strong>Fecha de Vencimiento:</strong> {detalle.fechaVencimiento}</li>
@@ -207,7 +265,7 @@ const CotizacionesPage = () => {
 
                 {detalle.advertencias && detalle.advertencias.length > 0 && (
                     <div className="col-12">
-                        <h3 className="text-orange-500">⚠️ Advertencias</h3>
+                        <h3 className="text-orange-500">Advertencias</h3>
                         <ul className="list-none p-0">
                             {detalle.advertencias.map((adv: string, index: number) => (
                                 <li key={index} className="mb-2 text-orange-500">
@@ -236,7 +294,7 @@ const CotizacionesPage = () => {
             <div className="col-12">
                 <Card>
                     <div className="flex justify-content-between align-items-center mb-4">
-                        <h2 className="m-0">📊 Cotizaciones de Seguros</h2>
+                        <h2 className="m-0">Cotizaciones de Seguros</h2>
                         <Button label="Nueva Cotización" icon="pi pi-plus" onClick={() => router.push('/nueva-cotizacion')} />
                     </div>
 
@@ -300,11 +358,11 @@ const CotizacionesPage = () => {
                     <div>
                         <div className="grid mb-4">
                             <div className="col-12 md:col-6">
-                                <h3>👤 Conductor</h3>
+                                <h3>Conductor</h3>
                                 <p><strong>Nombre:</strong> {selectedCotizacion.conductor.nombreConductor}</p>
                             </div>
                             <div className="col-12 md:col-6">
-                                <h3>🚗 Vehículo</h3>
+                                <h3>Vehículo</h3>
                                 <p>
                                     <strong>Vehículo:</strong> {selectedCotizacion.vehiculo.marca} {selectedCotizacion.vehiculo.modelo}
                                     <br />

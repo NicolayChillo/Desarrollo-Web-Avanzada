@@ -1,5 +1,17 @@
 import { Conductor } from "../Models/Conductor.js";
 
+// Función para calcular edad
+const calcularEdad = (fechaNacimiento) => {
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
+    }
+    return edad;
+};
+
 // crear conductor
 export const crearConductor = async (req, res) => {
     try {
@@ -8,6 +20,23 @@ export const crearConductor = async (req, res) => {
         if (!nombreConductor || !numeroLicenia || !fechaNacimiento) {
             return res.status(400).json({
                 mensaje: "Nombre del conductor, número de licencia y fecha de nacimiento son obligatorios"
+            });
+        }
+
+        // Validar que la fecha de nacimiento sea razonable
+        const fechaNac = new Date(fechaNacimiento);
+        const hoy = new Date();
+        
+        if (fechaNac > hoy) {
+            return res.status(400).json({
+                mensaje: "La fecha de nacimiento no puede estar en el futuro."
+            });
+        }
+        
+        const edad = calcularEdad(fechaNacimiento);
+        if (edad > 75 || edad < 0) {
+            return res.status(400).json({
+                mensaje: `Fecha de nacimiento inválida. Edad calculada: ${edad} años.`
             });
         }
 
@@ -83,6 +112,25 @@ export const actualizarConductor = async (req, res) => {
             return res.status(400).json({
                 mensaje: "Ingresar nombre del conductor, número de licencia y/o fecha de nacimiento"
             });
+        }
+
+        // Validar edad si se actualiza fecha de nacimiento
+        if (fechaNacimiento != null) {
+            const fechaNac = new Date(fechaNacimiento);
+            const hoy = new Date();
+            
+            if (fechaNac > hoy) {
+                return res.status(400).json({
+                    mensaje: "La fecha de nacimiento no puede estar en el futuro."
+                });
+            }
+            
+            const edad = calcularEdad(fechaNacimiento);
+            if (edad > 120 || edad < 0) {
+                return res.status(400).json({
+                    mensaje: `Fecha de nacimiento inválida. Edad calculada: ${edad} años.`
+                });
+            }
         }
 
         // Validar si la licencia esta siendo usada por otro conductor

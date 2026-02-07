@@ -7,11 +7,17 @@ import * as cotizacionService from "../Services/cotizacionService.js";
 // crear una nueva cotizacion
 export const crearCotizacion = async (req, res) => {
     try {
-        const { conductorId, usuarioId, vehiculoId, formaPago } = req.body;
+        const { conductorId, usuarioId, vehiculoId, formaPago, pagoEnCuotas, numeroCuotas, aceptaTerminos } = req.body;
 
         if (!conductorId || !usuarioId || !vehiculoId) {
             return res.status(400).json({
                 mensaje: "conductorId, usuarioId y vehiculoId son obligatorios"
+            });
+        }
+
+        if (!aceptaTerminos) {
+            return res.status(400).json({
+                mensaje: "Debe aceptar los términos y condiciones para generar la cotización"
             });
         }
 
@@ -20,7 +26,9 @@ export const crearCotizacion = async (req, res) => {
             conductorId,
             usuarioId,
             vehiculoId,
-            formaPago
+            formaPago,
+            pagoEnCuotas,
+            numeroCuotas
         );
 
         if (!resultado.exito) {
@@ -103,7 +111,7 @@ export const obtenerCotizaciones = async (req, res) => {
             include: [
                 { model: Usuario, as: "usuario", attributes: ["idUsuario", "nombreUsuario", "email"] },
                 { model: Conductor, as: "conductor", attributes: ["idConductor", "nombreConductor"] },
-                { model: Vehiculo, as: "vehiculo", attributes: ["idVehiculo", "numeroPlaca", "modelo"] }
+                { model: Vehiculo, as: "vehiculo", attributes: ["idVehiculo", "numeroPlaca", "modelo", "marca", "tipo"] }
             ],
             order: [['fechaCreacion', 'DESC']]
         });

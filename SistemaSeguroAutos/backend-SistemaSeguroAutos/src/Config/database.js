@@ -9,7 +9,7 @@ export const sequelize = new Sequelize(
     process.env.BD_PASSWORD,
     {
         host: process.env.BD_HOST,
-        port: process.env.BD_PORT || 3306,
+        port: process.env.BD_PORT || 3307,
         dialect: process.env.BD_DIALECT || "mysql",
         logging: false,
         timezone: '-05:00'

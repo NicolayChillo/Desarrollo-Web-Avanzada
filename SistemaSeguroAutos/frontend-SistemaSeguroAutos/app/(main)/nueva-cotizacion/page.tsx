@@ -146,15 +146,57 @@ const NuevaCotizacionPage = () => {
             return;
         }
 
+        // Validación inmediata de edad del conductor para evitar llamadas innecesarias
+        const conductorSeleccionado = conductores.find(c => c.idConductor === cotizacionConUsuario.conductorId);
+        if (conductorSeleccionado) {
+            const edad = calcularEdad(conductorSeleccionado.fechaNacimiento);
+            if (edad < 18) {
+                const msg = `Conductor menor de 18 años (${edad} años). No se permite generar cotización.`;
+                setError(msg);
+                toast.current?.show({ severity: 'error', summary: 'No permitido', detail: msg, life: 5000 });
+                return;
+            }
+            if (edad > 75) {
+                const msg = `Conductor mayor de 75 años (${edad} años). La cotización se rechaza automáticamente.`;
+                setError(msg);
+                toast.current?.show({ severity: 'error', summary: 'No permitido', detail: msg, life: 5000 });
+                return;
+            }
+            if (edad > 65) {
+                toast.current?.show({ severity: 'warn', summary: 'Edad avanzada', detail: 'Se aplicará recargo y posibles restricciones de cobertura', life: 4000 });
+            } else if (edad >= 18 && edad <= 24) {
+                toast.current?.show({ severity: 'warn', summary: 'Conductor joven', detail: 'Se aplicará recargo por conductor joven (18-24)', life: 4000 });
+            }
+            if ((conductorSeleccionado.numeroAccidentes ?? 0) > 3) {
+                toast.current?.show({ severity: 'warn', summary: 'Riesgo alto por accidentes', detail: 'Más de 3 accidentes: la cotización puede quedar pendiente o con recargo alto', life: 5000 });
+            }
+        }
+
+        const vehiculoSeleccionado = vehiculos.find(v => v.idVehiculo === cotizacionConUsuario.vehiculoId);
+        if (vehiculoSeleccionado) {
+            const antiguedad = new Date().getFullYear() - vehiculoSeleccionado.anio;
+            if (antiguedad > 20) {
+                const msg = `Vehículo con ${antiguedad} años. No puede ser cotizado (>20 años).`;
+                setError(msg);
+                toast.current?.show({ severity: 'error', summary: 'No permitido', detail: msg, life: 5000 });
+                return;
+            }
+        }
+
         setSaving(true);
         try {
             const response = await cotizacionService.create(cotizacionConUsuario);
             setResultado(response);
+            const estado = response?.detalles?.estado?.toLowerCase?.() || 'aprobada';
+            const detalle = estado === 'rechazada'
+                ? (response?.mensaje || 'Cotización rechazada por reglas de negocio')
+                : 'Cotización creada exitosamente';
+
             toast.current?.show({ 
-                severity: 'success', 
-                summary: 'Éxito', 
-                detail: 'Cotización creada exitosamente', 
-                life: 3000 
+                severity: estado === 'rechazada' ? 'error' : 'success', 
+                summary: estado === 'rechazada' ? 'Rechazada' : 'Éxito', 
+                detail: detalle, 
+                life: 5000 
             });
         } catch (error: any) {
             setError(error.message);
@@ -175,11 +217,21 @@ const NuevaCotizacionPage = () => {
 
     const conductorTemplate = (option: Conductor) => {
         const edad = calcularEdad(option.fechaNacimiento);
-        return `${option.nombreConductor} - ${edad} años - ${option.numeroAccidentes} accidentes`;
+        const riesgo = getRiesgoConductor(edad);
+        return `${option.nombreConductor} - ${edad} años - ${option.numeroAccidentes} accidentes - ${riesgo}`;
     };
 
     const vehiculoTemplate = (option: Vehiculo) => {
-        return `${option.marca} ${option.modelo} (${option.numeroPlaca}) - ${option.tipo} - ${formatCurrency(option.valorComercial)}`;
+        const antiguedad = new Date().getFullYear() - option.anio;
+        return `${option.marca} ${option.modelo} (${option.numeroPlaca}) - ${option.tipo} - ${antiguedad} años - ${formatCurrency(option.valorComercial)}`;
+    };
+
+    const getRiesgoConductor = (edad: number) => {
+        if (edad < 18) return 'No cotiza (<18)';
+        if (edad <= 24) return 'Recargo conductor joven';
+        if (edad <= 65) return 'Riesgo estándar';
+        if (edad <= 75) return 'Recargo edad avanzada';
+        return 'Rechazo (>75)';
     };
 
     const calcularEdad = (fechaNacimiento: string) => {
@@ -226,6 +278,19 @@ const NuevaCotizacionPage = () => {
                                     className={classNames({ 'p-invalid': submitted && !cotizacion.conductorId })}
                                 />
                                 {submitted && !cotizacion.conductorId && <small className="p-error">Seleccione un conductor.</small>}
+                                {cotizacion.conductorId !== 0 && (() => {
+                                    const c = conductores.find(x => x.idConductor === cotizacion.conductorId);
+                                    if (!c) return null;
+                                    const edad = calcularEdad(c.fechaNacimiento);
+                                    const riesgo = getRiesgoConductor(edad);
+                                    const accidentes = c.numeroAccidentes ?? 0;
+                                    const severity = edad < 18 || edad > 75 ? 'error' : (edad <= 24 || edad > 65 || accidentes > 3 ? 'warn' : 'info');
+                                    const msgEdad = `Riesgo: ${riesgo} (edad ${edad})`;
+                                    const msgAcc = accidentes === 0 ? 'Sin accidentes: aplica descuento' : `${accidentes} accidente(s)` + (accidentes > 3 ? ' — riesgo alto (puede requerir revisión)' : '');
+                                    return (
+                                        <Message severity={severity} text={`${msgEdad}. ${msgAcc}`} className="w-full mt-2" />
+                                    );
+                                })()}
                             </div>
                         </div>
 
@@ -245,6 +310,18 @@ const NuevaCotizacionPage = () => {
                                     className={classNames({ 'p-invalid': submitted && !cotizacion.vehiculoId })}
                                 />
                                 {submitted && !cotizacion.vehiculoId && <small className="p-error">Seleccione un vehículo.</small>}
+                                {cotizacion.vehiculoId !== 0 && (() => {
+                                    const v = vehiculos.find(x => x.idVehiculo === cotizacion.vehiculoId);
+                                    if (!v) return null;
+                                    const antiguedad = new Date().getFullYear() - v.anio;
+                                    const recargoUso = v.uso === 'comercial' ? 'Recargo por uso comercial' : 'Uso particular';
+                                    const tipoBase = v.tipo?.toLowerCase() === 'suv' || v.tipo?.toLowerCase() === 'camioneta' ? 'Costo base incrementado' : 'Costo base estándar';
+                                    const severity = antiguedad > 20 ? 'error' : (v.uso === 'comercial' ? 'warn' : 'info');
+                                    const msgAnt = antiguedad > 20 ? `Antigüedad ${antiguedad} años: no cotiza (>20)` : `Antigüedad ${antiguedad} años`;
+                                    return (
+                                        <Message severity={severity} text={`${tipoBase} · ${recargoUso} · ${msgAnt}`} className="w-full mt-2" />
+                                    );
+                                })()}
                             </div>
                         </div>
 
@@ -298,6 +375,20 @@ const NuevaCotizacionPage = () => {
                             <Divider />
                         </div>
 
+                        {cotizacion.formaPago && (
+                            <div className="col-12">
+                                <Message 
+                                    severity={cotizacion.formaPago === 'tarjeta_debito' ? 'warn' : 'info'}
+                                    text={cotizacion.formaPago === 'tarjeta_debito' 
+                                        ? 'Tarjeta de débito: activación pendiente hasta aprobación del banco.'
+                                        : (cotizacion.formaPago === 'tarjeta_credito' 
+                                            ? (cotizacion.pagoEnCuotas ? 'Tarjeta de crédito en cuotas: +15% recargo y emisión inmediata.' : 'Tarjeta de crédito: emisión inmediata. Puede aplicar descuento anual si eliges ANUAL.')
+                                            : 'Pago anual: 10% de descuento y emisión inmediata.')}
+                                    className="w-full"
+                                />
+                            </div>
+                        )}
+
                         <div className="col-12">
                             <div className="field-checkbox">
                                 <Checkbox
@@ -339,11 +430,19 @@ const NuevaCotizacionPage = () => {
                     <Card title="✅ Resultado de la Cotización" className="shadow-4">
                         <div className="grid">
                             <div className="col-12">
-                                <Message 
-                                    severity={resultado.detalles?.estado === 'aprobada' ? 'success' : 'warn'} 
-                                    text={`Estado: ${resultado.detalles?.estado?.toUpperCase()}`} 
-                                    className="w-full mb-3"
-                                />
+                                {(() => {
+                                    const estado = resultado.detalles?.estado?.toLowerCase?.() || 'aprobada';
+                                    let severity: 'success' | 'warn' | 'error' = 'success';
+                                    let text = `Estado: ${estado.toUpperCase()}`;
+                                    if (estado === 'rechazada') {
+                                        severity = 'error';
+                                        text = resultado.mensaje || 'Cotización rechazada por reglas de negocio';
+                                    } else if (estado === 'pendiente') {
+                                        severity = 'warn';
+                                        text = resultado.mensaje || 'Cotización pendiente por revisión o pago';
+                                    }
+                                    return <Message severity={severity} text={text} className="w-full mb-3" />;
+                                })()}
                             </div>
 
                             <div className="col-12 md:col-6 lg:col-3">

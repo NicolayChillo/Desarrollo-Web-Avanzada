@@ -7,10 +7,11 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
-import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { classNames } from 'primereact/utils';
+import { confirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import conductorService, { Conductor } from '../../../services/conductorService';
 import authService from '../../../services/authService';
 
@@ -87,16 +88,23 @@ const ConductoresPage = () => {
         setDialogVisible(true);
     };
 
-    const confirmDeleteConductor = async (conductor: Conductor) => {
-        if (window.confirm(`¿Está seguro de eliminar al conductor ${conductor.nombreConductor}?`)) {
-            try {
-                await conductorService.delete(conductor.idConductor!);
-                await cargarConductores();
-                toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Conductor eliminado', life: 3000 });
-            } catch (error: any) {
-                toast.current?.show({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
+    const confirmDeleteConductor = (conductor: Conductor) => {
+        confirmDialog({
+            message: `¿Está seguro de eliminar al conductor ${conductor.nombreConductor}?`,
+            header: 'Confirmar Eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí, eliminar',
+            rejectLabel: 'Cancelar',
+            accept: async () => {
+                try {
+                    await conductorService.delete(conductor.idConductor!);
+                    await cargarConductores();
+                    toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Conductor eliminado', life: 3000 });
+                } catch (error: any) {
+                    toast.current?.show({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
+                }
             }
-        }
+        });
     };
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
@@ -109,13 +117,11 @@ const ConductoresPage = () => {
     const onDateChange = (e: any) => {
         let _conductor = { ...conductor };
         const date = e.value as Date;
+        if (date && date > new Date()) {
+            toast.current?.show({ severity: 'warn', summary: 'Advertencia', detail: 'No se puede seleccionar fechas futuras', life: 3000 });
+            return;
+        }
         _conductor.fechaNacimiento = date ? date.toISOString().split('T')[0] : '';
-        setConductor(_conductor);
-    };
-
-    const onNumberChange = (e: any) => {
-        let _conductor = { ...conductor };
-        _conductor.numeroAccidentes = e.value || 0;
         setConductor(_conductor);
     };
 
@@ -161,6 +167,7 @@ const ConductoresPage = () => {
     return (
         <div className="grid">
             <Toast ref={toast} />
+            <ConfirmDialog />
             <div className="col-12">
                 <Card>
                     <div className="flex justify-content-between align-items-center mb-4">
@@ -208,17 +215,11 @@ const ConductoresPage = () => {
                                 dateFormat="yy-mm-dd" 
                                 showIcon 
                                 required 
+                                maxDate={new Date()}
                                 className={classNames({ 'p-invalid': submitted && !conductor.fechaNacimiento })} 
                             />
                             {submitted && !conductor.fechaNacimiento && <small className="p-error">La fecha de nacimiento es requerida.</small>}
-                        </div>
-                    </div>
-
-                    <div className="col-12">
-                        <div className="field">
-                            <label htmlFor="numeroAccidentes">Número de Accidentes</label>
-                            <InputNumber id="numeroAccidentes" value={conductor.numeroAccidentes} onValueChange={onNumberChange} min={0} showButtons />
-                            <small className="text-500">Cantidad de accidentes registrados del conductor</small>
+                            <small className="text-500">Solo se permiten fechas hasta hoy</small>
                         </div>
                     </div>
                 </div>

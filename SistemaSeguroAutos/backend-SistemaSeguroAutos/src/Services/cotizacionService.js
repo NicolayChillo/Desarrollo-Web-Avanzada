@@ -13,6 +13,7 @@ const RECARGO_CONDUCTOR_JOVEN = 0.25; // 25% recargo (18-24 años)
 const RECARGO_EDAD_AVANZADA = 0.20; // 20% recargo (>65 años)
 const DESCUENTO_SIN_ACCIDENTES = 0.10; // 10% descuento
 const RECARGO_POR_ACCIDENTE = 0.15; // 15% por cada accidente
+const RECARGO_ACCIDENTES_ALTOS = 0.40; // recargo adicional si hay más de 3 accidentes
 const RECARGO_USO_COMERCIAL = 0.30; // 30% recargo por uso comercial
 const DESCUENTO_PAGO_ANUAL = 0.10; // 10% descuento pago anual
 const RECARGO_PAGO_CUOTAS = 0.15; // 15% recargo pago en cuotas
@@ -99,26 +100,29 @@ const calcularAjustesAccidentes = async (conductorId) => {
     let recargo = 0;
     let descuento = 0;
     const detalles = {};
-    
-    const accidentes = await Accidente.findAll({
-        where: { conductorId }
-    });
-    
-    const cantidadAccidentes = accidentes.length;
-    
+
+    // Obtener conductor para ver su número de accidentes
+    const conductor = await Conductor.findByPk(conductorId);
+    const cantidadAccidentes = conductor?.numeroAccidentes || 0;
+
     if (cantidadAccidentes === 0) {
         descuento = DESCUENTO_SIN_ACCIDENTES;
         detalles.descuentoSinAccidentes = `${DESCUENTO_SIN_ACCIDENTES * 100}% (sin accidentes)`;
     } else if (cantidadAccidentes <= 3) {
         recargo = RECARGO_POR_ACCIDENTE * cantidadAccidentes;
         detalles.recargoPorAccidentes = `${recargo * 100}% (${cantidadAccidentes} accidentes)`;
+    } else {
+        // Más de 3 accidentes: recargo alto y marca para revisión manual
+        recargo = RECARGO_POR_ACCIDENTE * cantidadAccidentes + RECARGO_ACCIDENTES_ALTOS;
+        detalles.recargoPorAccidentes = `${(RECARGO_POR_ACCIDENTE * cantidadAccidentes) * 100}% (${cantidadAccidentes} accidentes)`;
+        detalles.recargoAltoAccidentes = `${RECARGO_ACCIDENTES_ALTOS * 100}% adicional por más de 3 accidentes`;
     }
-    
+
     return { recargo, descuento, cantidadAccidentes, detalles, requiereRevision: cantidadAccidentes > 3 };
 };
 
 // calcula la cotización completa
-export const calcularCotizacion = async (conductorId, usuarioId, vehiculoId, formaPago) => {
+export const calcularCotizacion = async (conductorId, usuarioId, vehiculoId, formaPago, pagoEnCuotas = false, numeroCuotas = null) => {
     try {
         // Validar existencia de registros
         const conductor = await Conductor.findByPk(conductorId);
@@ -181,14 +185,33 @@ export const calcularCotizacion = async (conductorId, usuarioId, vehiculoId, for
         
         // Ajustes por forma de pago (si se proporciona)
         let detallesPago = {};
-        if (formaPago) {
-            if (formaPago.toUpperCase() === "ANUAL") {
-                costoFinal = costoFinal * (1 - DESCUENTO_PAGO_ANUAL);
-                detallesPago.descuentoAnual = `${DESCUENTO_PAGO_ANUAL * 100}%`;
-            } else if (formaPago.toUpperCase() === "CUOTAS") {
+        const formaPagoNormalizada = (formaPago || "").toLowerCase();
+
+        if (formaPagoNormalizada === "anual") {
+            costoFinal = costoFinal * (1 - DESCUENTO_PAGO_ANUAL);
+            detallesPago.metodo = "pago_anual";
+            detallesPago.descuentoAnual = `${DESCUENTO_PAGO_ANUAL * 100}%`;
+        } else if (formaPagoNormalizada === "tarjeta_credito") {
+            detallesPago.metodo = "tarjeta_credito";
+            detallesPago.emisionInmediata = true;
+            if (pagoEnCuotas) {
                 costoFinal = costoFinal * (1 + RECARGO_PAGO_CUOTAS);
                 detallesPago.recargoCuotas = `${RECARGO_PAGO_CUOTAS * 100}%`;
+                detallesPago.numeroCuotas = numeroCuotas;
             }
+        } else if (formaPagoNormalizada === "tarjeta_debito") {
+            detallesPago.metodo = "tarjeta_debito";
+            detallesPago.activacion = "Pendiente de aprobación del banco";
+            if (pagoEnCuotas) {
+                costoFinal = costoFinal * (1 + RECARGO_PAGO_CUOTAS);
+                detallesPago.recargoCuotas = `${RECARGO_PAGO_CUOTAS * 100}%`;
+                detallesPago.numeroCuotas = numeroCuotas;
+            }
+        } else if (formaPagoNormalizada === "cuotas") {
+            costoFinal = costoFinal * (1 + RECARGO_PAGO_CUOTAS);
+            detallesPago.metodo = "cuotas";
+            detallesPago.recargoCuotas = `${RECARGO_PAGO_CUOTAS * 100}%`;
+            detallesPago.numeroCuotas = numeroCuotas;
         }
         
         costoFinal = parseFloat(costoFinal.toFixed(2));
@@ -196,10 +219,15 @@ export const calcularCotizacion = async (conductorId, usuarioId, vehiculoId, for
         // Determinar estado de la cotización
         let estado = "aprobada";
         let advertencias = [];
-        
+
         if (ajustesAccidentes.requiereRevision) {
             estado = "pendiente";
             advertencias.push("Más de 3 accidentes. Requiere revisión manual antes de aprobar.");
+        }
+
+        if (formaPagoNormalizada === "tarjeta_debito") {
+            estado = "pendiente"; // hasta que el banco confirme
+            advertencias.push("Pago con tarjeta de débito: activación pendiente de aprobación.");
         }
         
         return {

@@ -23,6 +23,11 @@ const AppMenu = () => {
                     to: '/vehiculos'
                 },
                 {
+                    label: 'Accidentes',
+                    icon: 'pi pi-fw pi-exclamation-triangle',
+                    to: '/accidentes'
+                },
+                {
                     label: 'Cotizaciones',
                     icon: 'pi pi-fw pi-list',
                     items: [

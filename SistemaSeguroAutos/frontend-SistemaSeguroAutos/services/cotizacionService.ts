@@ -59,6 +59,19 @@ class CotizacionService {
         }
         return response.json();
     }
+
+    async updateEstado(id: number, estado: string): Promise<any> {
+        const response = await fetch(`${API_URL}/cotizaciones/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ estado }),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.mensaje || 'Error al actualizar estado');
+        }
+        return response.json();
+    }
 }
 
 export default new CotizacionService();

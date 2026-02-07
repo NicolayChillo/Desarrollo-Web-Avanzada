@@ -1,5 +1,6 @@
 import { Accidente } from "../Models/Accidente.js";
 import { Conductor } from "../Models/Conductor.js";
+import { Vehiculo } from "../Models/Vehiculo.js";
 
 // crear accidente
 export const crearAccidente = async (req, res) => {
@@ -36,6 +37,10 @@ export const crearAccidente = async (req, res) => {
             gravedad: gravedad.toLowerCase()
         });
 
+        // Incrementar el contador de accidentes del conductor
+        conductor.numeroAccidentes = (conductor.numeroAccidentes || 0) + 1;
+        await conductor.save();
+
         res.status(201).json(nuevoAccidente);
 
     } catch (error) {
@@ -47,7 +52,12 @@ export const crearAccidente = async (req, res) => {
 // obtener todos los accidentes
 export const obtenerAccidentes = async (_req, res) => {
     try {
-        const accidentes = await Accidente.findAll();
+        const accidentes = await Accidente.findAll({
+            include: [
+                { model: Conductor, as: 'conductor' },
+                { model: Vehiculo, as: 'vehiculo' }
+            ]
+        });
         res.status(200).json(accidentes);
     } catch (error) {
         console.error("Error al obtener accidentes:", error);
@@ -58,7 +68,12 @@ export const obtenerAccidentes = async (_req, res) => {
 // obtener un accidente por id
 export const obtenerAccidente = async (req, res) => {
     try {
-        const accidente = await Accidente.findByPk(req.params.id);
+        const accidente = await Accidente.findByPk(req.params.id, {
+            include: [
+                { model: Conductor, as: 'conductor' },
+                { model: Vehiculo, as: 'vehiculo' }
+            ]
+        });
 
         if (!accidente) {
             return res.status(404).json({
@@ -150,6 +165,15 @@ export const eliminarAccidente = async (req, res) => {
             return res.status(404).json({
                 mensaje: "Accidente no encontrado"
             });
+        }
+
+        // Obtener el conductor asociado al accidente
+        const conductor = await Conductor.findByPk(accidente.conductorId);
+        
+        // Decrementar el contador de accidentes del conductor
+        if (conductor && conductor.numeroAccidentes > 0) {
+            conductor.numeroAccidentes -= 1;
+            await conductor.save();
         }
 
         await accidente.destroy();

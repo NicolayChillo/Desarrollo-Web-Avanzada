@@ -11,6 +11,8 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { classNames } from 'primereact/utils';
+import { confirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import vehiculoService, { Vehiculo } from '../../../services/vehiculoService';
 import authService from '../../../services/authService';
 
@@ -104,16 +106,23 @@ const VehiculosPage = () => {
         setDialogVisible(true);
     };
 
-    const confirmDeleteVehiculo = async (vehiculo: Vehiculo) => {
-        if (window.confirm(`¿Está seguro de eliminar el vehículo ${vehiculo.marca} ${vehiculo.modelo}?`)) {
-            try {
-                await vehiculoService.delete(vehiculo.idVehiculo!);
-                await cargarVehiculos();
-                toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Vehículo eliminado', life: 3000 });
-            } catch (error: any) {
-                toast.current?.show({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
+    const confirmDeleteVehiculo = (vehiculo: Vehiculo) => {
+        confirmDialog({
+            message: `¿Está seguro de eliminar el vehículo ${vehiculo.marca} ${vehiculo.modelo}?`,
+            header: 'Confirmar Eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sí, eliminar',
+            rejectLabel: 'Cancelar',
+            accept: async () => {
+                try {
+                    await vehiculoService.delete(vehiculo.idVehiculo!);
+                    await cargarVehiculos();
+                    toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Vehículo eliminado', life: 3000 });
+                } catch (error: any) {
+                    toast.current?.show({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
+                }
             }
-        }
+        });
     };
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
@@ -170,6 +179,7 @@ const VehiculosPage = () => {
     return (
         <div className="grid">
             <Toast ref={toast} />
+            <ConfirmDialog />
             <div className="col-12">
                 <Card>
                     <div className="flex justify-content-between align-items-center mb-4">
