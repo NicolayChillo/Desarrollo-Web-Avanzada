@@ -1,7 +1,15 @@
 package com.proyecto.backend_reservas_hoteleria.model;
 
 import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoHabitacion;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Habitacion {
@@ -16,6 +24,8 @@ public class Habitacion {
 
     private String imagen;
 
+    private Integer nBathroom;
+
     @Enumerated(EnumType.STRING)
     private EstadoHabitacion estado;
 
@@ -25,10 +35,11 @@ public class Habitacion {
 
     public Habitacion() {}
 
-    public Habitacion(String codigo, String descripcion, String imagen, EstadoHabitacion estado, TipoHabitacion tipoHabitacion) {
+    public Habitacion(String codigo, String descripcion, String imagen, Integer nBathroom, EstadoHabitacion estado, TipoHabitacion tipoHabitacion) {
         this.codigo = codigo;
         this.descripcion = descripcion;
         this.imagen = imagen;
+        this.nBathroom = nBathroom;
         this.estado = estado;
         this.tipoHabitacion = tipoHabitacion;
     }
@@ -63,6 +74,14 @@ public class Habitacion {
 
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public Integer getNBathroom() {
+        return nBathroom;
+    }
+
+    public void setNBathroom(Integer nBathroom) {
+        this.nBathroom = nBathroom;
     }
 
     public EstadoHabitacion getEstado() {

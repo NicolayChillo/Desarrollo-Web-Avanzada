@@ -1,17 +1,20 @@
 package com.proyecto.backend_reservas_hoteleria.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.proyecto.backend_reservas_hoteleria.dto.habitacion.HabitacionRequest;
 import com.proyecto.backend_reservas_hoteleria.dto.habitacion.HabitacionResponse;
 import com.proyecto.backend_reservas_hoteleria.model.Habitacion;
 import com.proyecto.backend_reservas_hoteleria.model.TipoHabitacion;
 import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoHabitacion;
+import com.proyecto.backend_reservas_hoteleria.model.enums.NombreTipoHabitacion;
 import com.proyecto.backend_reservas_hoteleria.repository.HabitacionRepository;
 import com.proyecto.backend_reservas_hoteleria.repository.TipoHabitacionRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @Service
 public class HabitacionService {
@@ -33,6 +36,7 @@ public class HabitacionService {
         habitacion.setCodigo(request.getCodigo());
         habitacion.setDescripcion(request.getDescripcion());
         habitacion.setImagen(request.getImagen());
+        habitacion.setNBathroom(request.getNBathroom());
         habitacion.setEstado(request.getEstado());
         habitacion.setTipoHabitacion(tipoHabitacion);
 
@@ -41,9 +45,23 @@ public class HabitacionService {
     }
 
     public List<HabitacionResponse> listar() {
-        return habitacionRepository.findAll().stream()
-                .map(this::mapearRespuesta)
+        System.out.println("\ud83d\udd0d [SERVICE] === listar() - Inicio ===");
+        List<Habitacion> todasLasHabitaciones = habitacionRepository.findAll();
+        System.out.println("\ud83d\udd0d [SERVICE] Habitaciones encontradas en BD: " + todasLasHabitaciones.size());
+        
+        List<HabitacionResponse> respuestas = todasLasHabitaciones.stream()
+                .map(habitacion -> {
+                    System.out.println("\ud83d\udd0d [SERVICE] Procesando habitacion: " + habitacion.getCodigo() + 
+                                     " | Estado: " + habitacion.getEstado() + 
+                                     " | Tipo: " + (habitacion.getTipoHabitacion() != null ? 
+                                                     habitacion.getTipoHabitacion().getNombre() : "NULL"));
+                    return mapearRespuesta(habitacion);
+                })
                 .toList();
+        
+        System.out.println("\ud83d\udd0d [SERVICE] Respuestas mapeadas: " + respuestas.size());
+        System.out.println("\ud83d\udd0d [SERVICE] === listar() - Fin ===");
+        return respuestas;
     }
 
     public HabitacionResponse obtener(Long idHabitacion) {
@@ -55,6 +73,7 @@ public class HabitacionService {
     public HabitacionResponse actualizar(Long idHabitacion,
                                          String codigo,
                                          String descripcion,
+                                         Integer nBathroom,
                                          EstadoHabitacion estado,
                                          Long idTipoHabitacion,
                                          String imagenUrl) {
@@ -69,6 +88,7 @@ public class HabitacionService {
         if (imagenUrl != null && !imagenUrl.isBlank()) {
             habitacion.setImagen(imagenUrl);
         }
+        habitacion.setNBathroom(nBathroom);
         habitacion.setEstado(estado);
         habitacion.setTipoHabitacion(tipoHabitacion);
 
@@ -82,6 +102,13 @@ public class HabitacionService {
         habitacionRepository.delete(habitacion);
     }
 
+    public List<HabitacionResponse> listarPorTipo(NombreTipoHabitacion nombreTipo) {
+        List<Habitacion> habitaciones = habitacionRepository.findByTipoHabitacionNombre(nombreTipo);
+        return habitaciones.stream()
+                .map(this::mapearRespuesta)
+                .toList();
+    }
+
 
     private TipoHabitacion obtenerTipoHabitacion(Long idTipoHabitacion) {
         return tipoHabitacionRepository.findById(idTipoHabitacion)
@@ -91,8 +118,12 @@ public class HabitacionService {
     private HabitacionResponse mapearRespuesta(Habitacion habitacion) {
         Long idTipoHabitacion = null;
         String nombreTipo = null;
+        BigDecimal precioBase = null;
+        Integer capacidadMaxima = null;
         if (habitacion.getTipoHabitacion() != null) {
             idTipoHabitacion = habitacion.getTipoHabitacion().getIdTipoHabitacion();
+            precioBase = habitacion.getTipoHabitacion().getPrecioBase();
+            capacidadMaxima = habitacion.getTipoHabitacion().getCapacidadMaxima();
             if (habitacion.getTipoHabitacion().getNombre() != null) {
                 nombreTipo = habitacion.getTipoHabitacion().getNombre().name();
             }
@@ -103,9 +134,12 @@ public class HabitacionService {
                 habitacion.getCodigo(),
                 habitacion.getDescripcion(),
                 habitacion.getImagen(),
+                habitacion.getNBathroom(),
                 habitacion.getEstado(),
                 idTipoHabitacion,
-                nombreTipo
+                nombreTipo,
+                precioBase,
+                capacidadMaxima
         );
     }
 }

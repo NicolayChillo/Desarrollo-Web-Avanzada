@@ -1,6 +1,7 @@
 package com.proyecto.backend_reservas_hoteleria.dto.habitacion;
 
 import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoHabitacion;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,6 +17,9 @@ public class HabitacionRequest {
     private String imagen;
 
     @NotNull
+    private Integer nBathroom;
+
+    @NotNull
     private EstadoHabitacion estado;
 
     @NotNull
@@ -24,10 +28,11 @@ public class HabitacionRequest {
     public HabitacionRequest() {
     }
 
-    public HabitacionRequest(String codigo, String descripcion, String imagen, EstadoHabitacion estado, Long idTipoHabitacion) {
+    public HabitacionRequest(String codigo, String descripcion, String imagen, Integer nBathroom, EstadoHabitacion estado, Long idTipoHabitacion) {
         this.codigo = codigo;
         this.descripcion = descripcion;
         this.imagen = imagen;
+        this.nBathroom = nBathroom;
         this.estado = estado;
         this.idTipoHabitacion = idTipoHabitacion;
     }
@@ -54,6 +59,14 @@ public class HabitacionRequest {
 
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public Integer getNBathroom() {
+        return nBathroom;
+    }
+
+    public void setNBathroom(Integer nBathroom) {
+        this.nBathroom = nBathroom;
     }
 
     public EstadoHabitacion getEstado() {

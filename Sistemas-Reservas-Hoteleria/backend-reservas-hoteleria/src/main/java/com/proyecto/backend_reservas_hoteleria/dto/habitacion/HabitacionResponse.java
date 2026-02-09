@@ -1,5 +1,7 @@
 package com.proyecto.backend_reservas_hoteleria.dto.habitacion;
 
+import java.math.BigDecimal;
+
 import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoHabitacion;
 
 public class HabitacionResponse {
@@ -8,9 +10,12 @@ public class HabitacionResponse {
     private String codigo;
     private String descripcion;
     private String imagen;
+    private Integer nBathroom;
     private EstadoHabitacion estado;
     private Long idTipoHabitacion;
     private String tipoHabitacionNombre;
+    private BigDecimal precioBase;
+    private Integer capacidadMaxima;
 
     public HabitacionResponse() {
     }
@@ -19,16 +24,22 @@ public class HabitacionResponse {
                               String codigo,
                               String descripcion,
                               String imagen,
+                              Integer nBathroom,
                               EstadoHabitacion estado,
                               Long idTipoHabitacion,
-                              String tipoHabitacionNombre) {
+                              String tipoHabitacionNombre,
+                              BigDecimal precioBase,
+                              Integer capacidadMaxima) {
         this.idHabitacion = idHabitacion;
         this.codigo = codigo;
         this.descripcion = descripcion;
         this.imagen = imagen;
+        this.nBathroom = nBathroom;
         this.estado = estado;
         this.idTipoHabitacion = idTipoHabitacion;
         this.tipoHabitacionNombre = tipoHabitacionNombre;
+        this.precioBase = precioBase;
+        this.capacidadMaxima = capacidadMaxima;
     }
 
     public Long getIdHabitacion() {
@@ -63,6 +74,14 @@ public class HabitacionResponse {
         this.imagen = imagen;
     }
 
+    public Integer getNBathroom() {
+        return nBathroom;
+    }
+
+    public void setNBathroom(Integer nBathroom) {
+        this.nBathroom = nBathroom;
+    }
+
     public EstadoHabitacion getEstado() {
         return estado;
     }
@@ -85,5 +104,21 @@ public class HabitacionResponse {
 
     public void setTipoHabitacionNombre(String tipoHabitacionNombre) {
         this.tipoHabitacionNombre = tipoHabitacionNombre;
+    }
+
+    public BigDecimal getPrecioBase() {
+        return precioBase;
+    }
+
+    public void setPrecioBase(BigDecimal precioBase) {
+        this.precioBase = precioBase;
+    }
+
+    public Integer getCapacidadMaxima() {
+        return capacidadMaxima;
+    }
+
+    public void setCapacidadMaxima(Integer capacidadMaxima) {
+        this.capacidadMaxima = capacidadMaxima;
     }
 }

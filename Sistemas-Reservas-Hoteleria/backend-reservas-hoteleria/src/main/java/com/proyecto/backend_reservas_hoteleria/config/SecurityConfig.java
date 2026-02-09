@@ -1,6 +1,7 @@
 package com.proyecto.backend_reservas_hoteleria.config;
 
-import com.proyecto.backend_reservas_hoteleria.service.CustomUserDetailsService;
+import java.util.Arrays;
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.proyecto.backend_reservas_hoteleria.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -34,10 +40,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain cadenaSeguridad(HttpSecurity http) throws Exception {
         // Define reglas de acceso y filtro JWT.
-        http.csrf(csrf -> csrf.disable())
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        // Permite GET público para consultar habitaciones y tipos
+                        .requestMatchers(HttpMethod.GET, "/tipos-habitacion/**", "/habitaciones/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/tipos-habitacion/**", "/habitaciones/**").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.PUT, "/tipos-habitacion/**", "/habitaciones/**").hasRole("ADMINISTRADOR")
                         .requestMatchers(HttpMethod.DELETE, "/tipos-habitacion/**", "/habitaciones/**").hasRole("ADMINISTRADOR")
@@ -50,6 +59,19 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
