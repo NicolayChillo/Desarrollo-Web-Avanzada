@@ -46,9 +46,11 @@ export default function NotificationBell({ tipo, onNavigate }: NotificationBellP
       const token = localStorage.getItem('token')
       if (!token) return
 
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+
       const endpoint = tipo === 'admin' 
-        ? 'http://localhost:8080/api/notificaciones/admin'
-        : 'http://localhost:8080/api/notificaciones/cliente'
+        ? `${baseUrl}/api/notificaciones/admin`
+        : `${baseUrl}/api/notificaciones/cliente`
 
       const response = await fetch(endpoint, {
         headers: {
