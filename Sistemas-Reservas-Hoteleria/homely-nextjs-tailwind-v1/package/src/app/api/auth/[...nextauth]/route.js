@@ -34,6 +34,9 @@ const handler = NextAuth({
       },
     }),
   ],
+  session: {
+    strategy: 'jwt',
+  },
   pages: {
     signIn: '/',
     error: '/',
@@ -55,6 +58,7 @@ const handler = NextAuth({
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: true,
 });
 
 export { handler as GET, handler as POST };
