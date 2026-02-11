@@ -8,7 +8,7 @@ import { getHabitaciones } from '@/services/api'
 import HabitacionCard from '@/components/Admin/HabitacionCard'
 import HabitacionForm from '@/components/Admin/HabitacionForm'
 
-const API_BASE_URL = 'http://localhost:9090'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://desarrollo-web-avanzada.onrender.com'
 
 interface TipoHabitacion {
   idTipoHabitacion: number

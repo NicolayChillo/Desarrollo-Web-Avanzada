@@ -46,7 +46,7 @@ export default function NotificationBell({ tipo, onNavigate }: NotificationBellP
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://desarrollo-web-avanzada.onrender.com';
 
       const endpoint = tipo === 'admin' 
         ? `${baseUrl}/api/notificaciones/admin`

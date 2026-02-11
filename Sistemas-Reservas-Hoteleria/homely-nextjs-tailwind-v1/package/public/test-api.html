@@ -69,7 +69,7 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:9090';
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://desarrollo-web-avanzada.onrender.com';
         const resultDiv = document.getElementById('result');
 
         function log(message, type = 'info') {

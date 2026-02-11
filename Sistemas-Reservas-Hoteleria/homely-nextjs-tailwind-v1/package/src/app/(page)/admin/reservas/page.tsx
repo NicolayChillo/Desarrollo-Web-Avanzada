@@ -5,7 +5,7 @@ import { Icon } from '@iconify/react'
 import { Toast } from 'primereact/toast'
 import { getAllReservas, confirmarReserva, cancelarReserva } from '@/services/api'
 
-const API_BASE_URL = 'http://localhost:9090'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://desarrollo-web-avanzada.onrender.com'
 
 interface Reserva {
   idReserva: number

@@ -39,12 +39,14 @@ export default function MisReservasPage() {
         return
       }
 
-      const response = await fetch('http://localhost:9090/reservas/mias', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://desarrollo-web-avanzada.onrender.com';
+
+      const response = await fetch(`${API_URL}/reservas/mias`, {
+          headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+          }
+      });
 
       if (response.ok) {
         const data = await response.json()
