@@ -52,6 +52,3 @@ frontend/.env
 *.bak
 *.tmp
 *.swp
-
-# Spring Boot config local
-src/main/resources/application.properties
