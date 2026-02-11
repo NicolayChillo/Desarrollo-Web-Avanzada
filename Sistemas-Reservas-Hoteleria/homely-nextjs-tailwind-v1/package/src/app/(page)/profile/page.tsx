@@ -137,7 +137,6 @@ export default function ProfilePage() {
       <Toast ref={toast} position="top-center" />
       <div className="container mx-auto max-w-8xl px-5 2xl:px-0">
         <h1 className="text-4xl font-bold text-dark dark:text-white mb-8">Mi Perfil</h1>
-        
         <div className="grid grid-cols-12 gap-8">
           {/* Menú lateral */}
           <div className="lg:col-span-3 col-span-12">
@@ -150,7 +149,6 @@ export default function ProfilePage() {
                 <h3 className="font-semibold text-lg text-dark dark:text-white">{userData?.sub || 'Usuario'}</h3>
                 <p className="text-sm text-dark/50 dark:text-white/50">{userData?.rol || 'Cliente'}</p>
               </div>
-
               {/* Opciones del menú */}
               <nav className="space-y-2">
                 <button
@@ -164,7 +162,6 @@ export default function ProfilePage() {
                   <Icon icon="ph:user" width={20} height={20} />
                   <span className="font-medium text-sm">Información Personal</span>
                 </button>
-
                 <button
                   onClick={() => setActiveTab('reservas')}
                   className={`flex items-center gap-3 p-3 rounded-lg w-full transition-colors duration-200 ${
@@ -176,22 +173,9 @@ export default function ProfilePage() {
                   <Icon icon="ph:calendar-check" width={20} height={20} />
                   <span className="font-medium text-sm">Mis Reservas</span>
                 </button>
-
-                <button
-                  onClick={() => setActiveTab('configuracion')}
-                  className={`flex items-center gap-3 p-3 rounded-lg w-full transition-colors duration-200 ${
-                    activeTab === 'configuracion'
-                      ? 'bg-primary text-white'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-dark dark:text-white'
-                  }`}
-                >
-                  <Icon icon="ph:gear" width={20} height={20} />
-                  <span className="font-medium text-sm">Configuración</span>
-                </button>
               </nav>
             </div>
           </div>
-
           {/* Contenido principal */}
           <div className="lg:col-span-9 col-span-12">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
@@ -219,17 +203,14 @@ export default function ProfilePage() {
                     </div>
                     <div className="mt-6">
                       <p className="text-dark/60 dark:text-white/60 text-sm">
-                        Sección en desarrollo. Pronto podrás editar tu información personal.
                       </p>
                     </div>
                   </div>
                 </div>
               )}
-
               {activeTab === 'reservas' && (
                 <div>
                   <h2 className="text-2xl font-bold text-dark dark:text-white mb-6">Mis Reservas</h2>
-                  
                   {loading ? (
                     <div className="text-center py-12">
                       <Icon icon="ph:spinner" width={48} height={48} className="text-primary animate-spin mx-auto mb-4" />
@@ -265,8 +246,6 @@ export default function ProfilePage() {
                                   {reserva.estado}
                                 </span>
                               </div>
-                              
-                              {/* Detalles de la reserva */}
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                 <div className="flex items-center gap-2 text-dark/70 dark:text-white/70">
                                   <Icon icon="ph:calendar" width={18} height={18} />
@@ -293,7 +272,6 @@ export default function ProfilePage() {
                                   </span>
                                 </div>
                               </div>
-
                               {reserva.observacion && (
                                 <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                   <p className="text-xs text-dark/60 dark:text-white/60 mb-1">
@@ -303,7 +281,6 @@ export default function ProfilePage() {
                                   <p className="text-sm text-dark dark:text-white">{reserva.observacion}</p>
                                 </div>
                               )}
-
                               <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                                 <div className="flex items-center justify-between">
                                   <span className="text-sm text-dark/60 dark:text-white/60">
@@ -315,8 +292,6 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                             </div>
-
-                            {/* Acciones */}
                             {reserva.estado === 'PENDIENTE' && (
                               <div className="lg:border-l lg:border-gray-200 dark:lg:border-gray-600 lg:pl-6">
                                 <button
@@ -331,7 +306,6 @@ export default function ProfilePage() {
                                 </p>
                               </div>
                             )}
-
                             {reserva.estado === 'CONFIRMADA' && (
                               <div className="lg:border-l lg:border-gray-200 dark:lg:border-gray-600 lg:pl-6">
                                 <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
@@ -343,7 +317,6 @@ export default function ProfilePage() {
                                 </p>
                               </div>
                             )}
-
                             {reserva.estado === 'CANCELADA' && (
                               <div className="lg:border-l lg:border-gray-200 dark:lg:border-gray-600 lg:pl-6">
                                 <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
@@ -357,34 +330,6 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   )}
-                </div>
-              )}
-
-              {activeTab === 'configuracion' && (
-                <div>
-                  <h2 className="text-2xl font-bold text-dark dark:text-white mb-6">Configuración</h2>
-                  <div className="space-y-6">
-                    <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-                      <h3 className="font-semibold text-lg text-dark dark:text-white mb-4">Preferencias de Cuenta</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-dark dark:text-white">Notificaciones por email</p>
-                            <p className="text-sm text-dark/50 dark:text-white/50">Recibe actualizaciones sobre tus reservas</p>
-                          </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" className="sr-only peer" defaultChecked />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-dark/60 dark:text-white/60 text-sm">
-                        Más opciones de configuración estarán disponibles próximamente.
-                      </p>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
