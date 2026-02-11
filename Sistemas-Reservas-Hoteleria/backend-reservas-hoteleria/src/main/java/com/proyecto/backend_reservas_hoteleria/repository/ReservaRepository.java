@@ -1,14 +1,17 @@
 package com.proyecto.backend_reservas_hoteleria.repository;
 
-import com.proyecto.backend_reservas_hoteleria.model.Reserva;
-import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoReserva;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
+import com.proyecto.backend_reservas_hoteleria.model.Reserva;
+import com.proyecto.backend_reservas_hoteleria.model.Usuario;
+import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoReserva;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
@@ -19,6 +22,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     );
 
     List<Reserva> findByUsuarioIdUsuario(Long idUsuario);
+
+    List<Reserva> findByUsuarioAndFechaReservaAfter(Usuario usuario, LocalDateTime  fechaReserva);
 
     // ==================== MÉTODOS PARA DASHBOARD ====================
     

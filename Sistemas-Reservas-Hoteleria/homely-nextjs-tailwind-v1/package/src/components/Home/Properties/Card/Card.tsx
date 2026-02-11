@@ -11,15 +11,15 @@ const PropertyCard: React.FC<{ item: PropertyHomes }> = ({ item }) => {
   return (
     <div>
       <div className='relative rounded-2xl border border-dark/10 dark:border-white/10 group hover:shadow-3xl duration-300 dark:hover:shadow-white/20'>
-        <div className='overflow-hidden rounded-t-2xl'>
-          <Link href={`/properties/${slug}`}>
+        <div className='overflow-hidden rounded-t-2xl h-[300px]'>
+          <Link href={`/detalles/${slug}`}>
             {mainImage && (
               <Image
                 src={mainImage}
                 alt={name}
                 width={440}
                 height={300}
-                className='w-full rounded-t-2xl group-hover:brightness-50 group-hover:scale-125 transition duration-300 delay-75'
+                className='w-full h-full object-cover rounded-t-2xl group-hover:brightness-50 group-hover:scale-125 transition duration-300 delay-75'
                 unoptimized={true}
               />
             )}
@@ -36,7 +36,7 @@ const PropertyCard: React.FC<{ item: PropertyHomes }> = ({ item }) => {
         <div className='p-6'>
           <div className='flex flex-col mobile:flex-row gap-5 mobile:gap-0 justify-between mb-6'>
             <div>
-              <Link href={`/properties/${slug}`}>
+              <Link href={`/detalles/${slug}`}>
                 <h3 className='text-xl font-medium text-black dark:text-white duration-300 group-hover:text-primary'>
                   {name}
                 </h3>

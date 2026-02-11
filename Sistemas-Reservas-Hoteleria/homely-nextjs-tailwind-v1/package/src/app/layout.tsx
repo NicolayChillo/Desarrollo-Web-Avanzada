@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import { Bricolage_Grotesque } from 'next/font/google'
 import './globals.css'
-import Header from '@/components/Layout/Header'
-import Footer from '@/components/Layout/Footer'
 import { ThemeProvider } from 'next-themes'
 import NextTopLoader from 'nextjs-toploader';
 import SessionProviderComp from '@/components/nextauth/SessionProvider'
+import ClientLayout from '@/components/Layout/ClientLayout'
 
 const font = Bricolage_Grotesque({ subsets: ["latin"] });
 
@@ -23,16 +22,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <body className={`${font.className} bg-white dark:bg-black antialiased`} suppressHydrationWarning>
+      <body className={`${font.className} antialiased`} suppressHydrationWarning>
         <NextTopLoader color="#07be8a" />
         <SessionProviderComp session={session}>
           <ThemeProvider
             attribute='class'
             enableSystem={true}
             defaultTheme='light'>
-            <Header />
-            {children}
-            <Footer />
+            <ClientLayout>
+              {children}
+            </ClientLayout>
           </ThemeProvider>
         </SessionProviderComp>
       </body>

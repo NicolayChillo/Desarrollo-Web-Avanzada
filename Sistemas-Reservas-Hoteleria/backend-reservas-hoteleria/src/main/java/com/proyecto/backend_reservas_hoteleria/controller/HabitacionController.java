@@ -2,6 +2,8 @@ package com.proyecto.backend_reservas_hoteleria.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,7 @@ public class HabitacionController {
 
     private final HabitacionService habitacionService;
     private final CloudinaryService cloudinaryService;
+    private static final Logger logger = LoggerFactory.getLogger(HabitacionController.class);
 
     public HabitacionController(HabitacionService habitacionService, CloudinaryService cloudinaryService) {
         this.habitacionService = habitacionService;
@@ -40,6 +43,7 @@ public class HabitacionController {
                                                     @RequestParam("estado") EstadoHabitacion estado,
                                                     @RequestParam("idTipoHabitacion") Long idTipoHabitacion,
                                                     @RequestParam("imagen") MultipartFile imagen) {
+        logger.info("[CONTROLLER] Crear habitacion request codigo={} nBathroom={} estado={} idTipo={}", codigo, nBathroom, estado, idTipoHabitacion);
         String imagenUrl = cloudinaryService.subirImagen(imagen);
         HabitacionRequest request = new HabitacionRequest(codigo, descripcion, imagenUrl, nBathroom, estado, idTipoHabitacion);
         return ResponseEntity.ok(habitacionService.crear(request));

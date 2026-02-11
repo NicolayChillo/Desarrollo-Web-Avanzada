@@ -1,5 +1,14 @@
 package com.proyecto.backend_reservas_hoteleria.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.proyecto.backend_reservas_hoteleria.dto.reserva.ReservaRequest;
 import com.proyecto.backend_reservas_hoteleria.dto.reserva.ReservaResponse;
 import com.proyecto.backend_reservas_hoteleria.model.Habitacion;
@@ -11,14 +20,6 @@ import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoReserva;
 import com.proyecto.backend_reservas_hoteleria.repository.HabitacionRepository;
 import com.proyecto.backend_reservas_hoteleria.repository.ReservaRepository;
 import com.proyecto.backend_reservas_hoteleria.repository.UsuarioRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Service
 public class ReservaService {
@@ -160,7 +161,30 @@ public class ReservaService {
         Long idUsuario = reserva.getUsuario() != null ? reserva.getUsuario().getIdUsuario() : null;
         Long idHabitacion = reserva.getHabitacion() != null ? reserva.getHabitacion().getIdHabitacion() : null;
 
-        return new ReservaResponse(
+        ReservaResponse.HabitacionInfo habitacionInfo = null;
+        if (reserva.getHabitacion() != null) {
+            ReservaResponse.TipoHabitacionInfo tipoInfo = null;
+            if (reserva.getHabitacion().getTipoHabitacion() != null) {
+                String nombreTipo = reserva.getHabitacion().getTipoHabitacion().getNombre() != null 
+                    ? reserva.getHabitacion().getTipoHabitacion().getNombre().name() 
+                    : null;
+                tipoInfo = new ReservaResponse.TipoHabitacionInfo(nombreTipo);
+            }
+            habitacionInfo = new ReservaResponse.HabitacionInfo(
+                reserva.getHabitacion().getCodigo(),
+                tipoInfo
+            );
+        }
+
+        ReservaResponse.UsuarioInfo usuarioInfo = null;
+        if (reserva.getUsuario() != null) {
+            usuarioInfo = new ReservaResponse.UsuarioInfo(
+                reserva.getUsuario().getNombre(),
+                reserva.getUsuario().getCorreo()
+            );
+        }
+
+        ReservaResponse response = new ReservaResponse(
                 reserva.getIdReserva(),
                 reserva.getFechaReserva(),
                 reserva.getFechaInicio(),
@@ -172,5 +196,8 @@ public class ReservaService {
                 idUsuario,
                 idHabitacion
         );
+        response.setHabitacion(habitacionInfo);
+        response.setUsuario(usuarioInfo);
+        return response;
     }
 }

@@ -1,9 +1,9 @@
 package com.proyecto.backend_reservas_hoteleria.dto.reserva;
 
-import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoReserva;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import com.proyecto.backend_reservas_hoteleria.model.enums.EstadoReserva;
 
 public class ReservaResponse {
 
@@ -17,6 +17,55 @@ public class ReservaResponse {
     private String observacion;
     private Long idUsuario;
     private Long idHabitacion;
+    private HabitacionInfo habitacion;
+    private UsuarioInfo usuario;
+
+    public static class HabitacionInfo {
+        private String codigo;
+        private TipoHabitacionInfo tipoHabitacion;
+
+        public HabitacionInfo() {}
+
+        public HabitacionInfo(String codigo, TipoHabitacionInfo tipoHabitacion) {
+            this.codigo = codigo;
+            this.tipoHabitacion = tipoHabitacion;
+        }
+
+        public String getCodigo() { return codigo; }
+        public void setCodigo(String codigo) { this.codigo = codigo; }
+        public TipoHabitacionInfo getTipoHabitacion() { return tipoHabitacion; }
+        public void setTipoHabitacion(TipoHabitacionInfo tipoHabitacion) { this.tipoHabitacion = tipoHabitacion; }
+    }
+
+    public static class TipoHabitacionInfo {
+        private String nombreTipo;
+
+        public TipoHabitacionInfo() {}
+
+        public TipoHabitacionInfo(String nombreTipo) {
+            this.nombreTipo = nombreTipo;
+        }
+
+        public String getNombreTipo() { return nombreTipo; }
+        public void setNombreTipo(String nombreTipo) { this.nombreTipo = nombreTipo; }
+    }
+
+    public static class UsuarioInfo {
+        private String nombre;
+        private String correo;
+
+        public UsuarioInfo() {}
+
+        public UsuarioInfo(String nombre, String correo) {
+            this.nombre = nombre;
+            this.correo = correo;
+        }
+
+        public String getNombre() { return nombre; }
+        public void setNombre(String nombre) { this.nombre = nombre; }
+        public String getCorreo() { return correo; }
+        public void setCorreo(String correo) { this.correo = correo; }
+    }
 
     public ReservaResponse() {
     }
@@ -121,5 +170,21 @@ public class ReservaResponse {
 
     public void setIdHabitacion(Long idHabitacion) {
         this.idHabitacion = idHabitacion;
+    }
+
+    public HabitacionInfo getHabitacion() {
+        return habitacion;
+    }
+
+    public void setHabitacion(HabitacionInfo habitacion) {
+        this.habitacion = habitacion;
+    }
+
+    public UsuarioInfo getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuarioInfo usuario) {
+        this.usuario = usuario;
     }
 }

@@ -73,6 +73,10 @@ public class AuthService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtService.generarToken(userDetails);
 
-        return new LoginResponse(token);
+        // Obtener información adicional del usuario
+        Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        return new LoginResponse(token, usuario.getIdUsuario(), usuario.getRol().getTipoRol().name());
     }
 }

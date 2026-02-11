@@ -1,9 +1,15 @@
 import { NavLinks } from '@/types/navlink'
 
 export const navLinks: NavLinks[] = [
-  { label: 'Home', href: '/' },
-  { label: 'Properties', href: '/properties' },
-  { label: 'Blog', href: '/blogs' },
-  { label: 'Contact', href: '/contactus' },
-  { label: 'Docs', href: '/documentation' },
+  { label: 'Inicio', href: '/home' },
+  { 
+    label: 'Habitaciones', 
+    href: '/detalles',
+    submenu: [
+      { label: 'Simple', href: '/simple' },
+      { label: 'Doble', href: '/doble' },
+      { label: 'Estudio', href: '/estudio' },
+      { label: 'Suite', href: '/Suite' },
+    ]
+  },
 ]
