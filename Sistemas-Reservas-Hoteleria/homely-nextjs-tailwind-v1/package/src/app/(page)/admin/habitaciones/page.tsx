@@ -247,7 +247,6 @@ export default function HabitacionesPage() {
         {showForm && (
           <HabitacionForm
             habitacion={editingHabitacion}
-            tiposHabitacion={tiposHabitacion}
             onSubmit={handleSubmitForm}
             onCancel={() => {
               setShowForm(false)

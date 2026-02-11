@@ -14,7 +14,7 @@ interface Habitacion {
   idHabitacion?: number
   codigo: string
   descripcion: string
-  numeroBanos: number
+  nBathroom: number
   estado: string
   tipoHabitacion?: TipoHabitacion
   imagen?: string
@@ -37,7 +37,7 @@ export default function HabitacionForm({ habitacion, onSubmit, onCancel }: Habit
   const [formData, setFormData] = useState({
     codigo: habitacion?.codigo || '',
     descripcion: habitacion?.descripcion || '',
-    numeroBanos: habitacion?.numeroBanos || 1,
+    nBathroom: habitacion?.nBathroom || 1,
     estado: habitacion?.estado || 'DISPONIBLE',
     idTipoHabitacion: habitacion?.tipoHabitacion?.idTipoHabitacion || '',
     imagen: null as File | null,
@@ -76,7 +76,7 @@ export default function HabitacionForm({ habitacion, onSubmit, onCancel }: Habit
       const form = new FormData()
       form.append('codigo', formData.codigo)
       form.append('descripcion', formData.descripcion)
-      form.append('nBathroom', formData.numeroBanos.toString())
+      form.append('nBathroom', formData.nBathroom.toString())
       form.append('estado', formData.estado)
       form.append('idTipoHabitacion', formData.idTipoHabitacion.toString())
 
@@ -177,8 +177,8 @@ export default function HabitacionForm({ habitacion, onSubmit, onCancel }: Habit
               </label>
               <input
                 type="number"
-                name="numeroBanos"
-                value={formData.numeroBanos}
+                name="nBathroom"
+                value={formData.nBathroom}
                 onChange={handleInputChange}
                 min="1"
                 required
