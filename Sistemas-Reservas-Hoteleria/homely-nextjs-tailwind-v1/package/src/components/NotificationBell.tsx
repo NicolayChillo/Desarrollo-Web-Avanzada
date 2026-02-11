@@ -47,8 +47,8 @@ export default function NotificationBell({ tipo, onNavigate }: NotificationBellP
       if (!token) return
 
       const endpoint = tipo === 'admin' 
-        ? 'http://localhost:9090/api/notificaciones/admin'
-        : 'http://localhost:9090/api/notificaciones/cliente'
+        ? 'http://localhost:8080/api/notificaciones/admin'
+        : 'http://localhost:8080/api/notificaciones/cliente'
 
       const response = await fetch(endpoint, {
         headers: {
