@@ -1,15 +1,20 @@
 package com.proyecto.backend_reservas_hoteleria.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.proyecto.backend_reservas_hoteleria.dto.dashboard.DashboardResumenDTO;
 import com.proyecto.backend_reservas_hoteleria.dto.dashboard.EstadisticasGeneralesDTO;
 import com.proyecto.backend_reservas_hoteleria.dto.dashboard.OcupacionMensualDTO;
 import com.proyecto.backend_reservas_hoteleria.dto.dashboard.TopHabitacionDTO;
 import com.proyecto.backend_reservas_hoteleria.service.DashboardService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Controlador REST para el módulo Dashboard
@@ -43,7 +48,7 @@ public class DashboardController {
      * }
      */
     @GetMapping("/resumen")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<DashboardResumenDTO> obtenerResumenDashboard() {
         DashboardResumenDTO resumen = dashboardService.obtenerResumenDashboard();
         return ResponseEntity.ok(resumen);
@@ -57,7 +62,7 @@ public class DashboardController {
      * @return JSON con totalIngresos, totalReservas, habitacionesDisponibles, etc.
      */
     @GetMapping("/estadisticas")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<EstadisticasGeneralesDTO> obtenerEstadisticasGenerales() {
         EstadisticasGeneralesDTO estadisticas = dashboardService.obtenerEstadisticasGenerales();
         return ResponseEntity.ok(estadisticas);
@@ -71,7 +76,7 @@ public class DashboardController {
      * @return Lista con datos de ocupación mes por mes
      */
     @GetMapping("/ocupacion-mensual")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<List<OcupacionMensualDTO>> obtenerOcupacionMensual() {
         List<OcupacionMensualDTO> ocupacion = dashboardService.obtenerOcupacionMensualUltimos12Meses();
         return ResponseEntity.ok(ocupacion);
@@ -87,7 +92,7 @@ public class DashboardController {
      * @return Datos de ocupación del mes solicitado
      */
     @GetMapping("/ocupacion-mensual/mes")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<OcupacionMensualDTO> obtenerOcupacionPorMes(
             @RequestParam Integer mes,
             @RequestParam Integer año) {
@@ -104,7 +109,7 @@ public class DashboardController {
      * @return Lista con el ranking de habitaciones
      */
     @GetMapping("/top-habitaciones")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<List<TopHabitacionDTO>> obtenerTopHabitaciones(
             @RequestParam(defaultValue = "5") Integer limite) {
         List<TopHabitacionDTO> topHabitaciones = dashboardService.obtenerTopHabitaciones(limite);

@@ -1,9 +1,9 @@
 import { Icon } from '@iconify/react'
 import PropertyCard from './Card/Card'
-import { getPropertyHomes } from '@/app/api/propertyhomes'
+import { getAllHabitaciones } from '@/app/api/propertyhomes'
 
 const Properties = async () => {
-  const propertyHomes = await getPropertyHomes();
+  const propertyHomes = await getAllHabitaciones();
   
   return (
     <section>

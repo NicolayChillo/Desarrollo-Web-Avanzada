@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     // Rutas públicas que no requieren JWT
     private static final List<String> RUTAS_PUBLICAS = Arrays.asList(
@@ -57,29 +61,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         
         // Valida JWT en cada request protegido.
-        String authHeader = request.getHeader("Authorization");
+            String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String token = authHeader.substring(7);
-        String username = jwtService.extraerUsuario(token);
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtService.esTokenValido(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (authHeader == null) {
+                logger.warn("[JWT] Falta Authorization header para request {} {}", method, requestPath);
+                filterChain.doFilter(request, response);
+                return;
             }
-        }
+            if (!authHeader.startsWith("Bearer ")) {
+                logger.warn("[JWT] Authorization header presente pero formato inválido: '{}' para request {} {}", authHeader, method, requestPath);
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-        filterChain.doFilter(request, response);
+            logger.info("[JWT] Authorization header presente (longitud={}) para request {} {}", authHeader.length(), method, requestPath);
+
+            String token = authHeader.substring(7);
+            String username = jwtService.extraerUsuario(token);
+
+            logger.info("[JWT] Usuario extraído del token: {} para request {} {}", username, method, requestPath);
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                boolean valido = jwtService.esTokenValido(token, userDetails);
+                logger.info("[JWT] ¿Token válido?: {} para usuario {} en {} {}", valido, username, method, requestPath);
+                if (valido) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    logger.warn("[JWT] Token inválido para usuario {} en {} {}", username, method, requestPath);
+                }
+            } else if (username == null) {
+                logger.warn("[JWT] No se pudo extraer usuario del token para request {} {}", method, requestPath);
+            }
+
+            filterChain.doFilter(request, response);
     }
 }

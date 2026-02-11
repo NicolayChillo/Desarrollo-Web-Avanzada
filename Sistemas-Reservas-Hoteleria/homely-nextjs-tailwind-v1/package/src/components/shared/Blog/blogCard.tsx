@@ -1,22 +1,32 @@
 import React, { FC } from "react";
-import Image from "next/image";
 import { Blog } from "@/types/blog";
 import { format } from "date-fns";
 import Link from "next/link";
+import { Icon } from "@iconify/react";
 
 const BlogCard: FC<{ blog: Blog }> = ({ blog }) => {
-    const { title, coverImage, date, slug, tag } = blog;
+    const { title, date, slug, tag } = blog;
+    
+    // Iconos según el tipo de tag/categoría
+    const getIcon = (tagName: string) => {
+        const tagLower = tagName.toLowerCase();
+        if (tagLower.includes('wifi') || tagLower.includes('internet')) return 'ph:wifi-high-fill';
+        if (tagLower.includes('comida') || tagLower.includes('desayuno')) return 'ph:fork-knife-fill';
+        if (tagLower.includes('servicio') || tagLower.includes('atención')) return 'ph:user-circle-fill';
+        if (tagLower.includes('ubicación') || tagLower.includes('lugar')) return 'ph:map-pin-fill';
+        if (tagLower.includes('habitación') || tagLower.includes('room')) return 'ph:bed-fill';
+        if (tagLower.includes('limpieza') || tagLower.includes('clean')) return 'ph:broom-fill';
+        return 'ph:lightbulb-fill'; // Icono por defecto
+    };
+
     return (
-        <Link href={`/blogs/${slug}`} aria-label="blog cover 5xl:h-full 5xl:inline-block" className="gap-4 group">
-            <div className="overflow-hidden rounded-2xl flex-shrink-0">
-                <Image
-                    src={coverImage!}
-                    alt="image"
-                    className="transition group-hover:scale-110"
-                    width={190}
-                    height={163}
-                    style={{ width: "100%", height: "100%" }}
-                    unoptimized={true}
+        <Link href={`/blogs/${slug}`} aria-label="blog card" className="gap-4 group block">
+            <div className="overflow-hidden rounded-2xl flex-shrink-0 bg-gradient-to-br from-primary/10 to-blue-100 dark:from-primary/20 dark:to-blue-900/30 flex items-center justify-center aspect-video">
+                <Icon 
+                    icon={getIcon(tag)} 
+                    className="text-primary dark:text-primary/80 transition-transform group-hover:scale-110"
+                    width={80}
+                    height={80}
                 />
             </div>
             <div className="flex justify-between items-center">

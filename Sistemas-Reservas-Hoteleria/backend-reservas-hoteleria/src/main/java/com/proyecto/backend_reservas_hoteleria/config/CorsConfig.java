@@ -15,8 +15,14 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         
         config.setAllowCredentials(true);
+        // Durante desarrollo permitir el origen local y permitir explicitamente el header Authorization
         config.addAllowedOriginPattern("http://localhost:3000");
+        config.addAllowedOriginPattern("http://127.0.0.1:3000");
+        config.addAllowedOriginPattern("http://localhost:3001");
+        config.addAllowedOriginPattern("*"); // permitir otros orígenes en dev
         config.addAllowedHeader("*");
+        config.addAllowedHeader("Authorization");
+        config.addExposedHeader("Authorization");
         config.addAllowedMethod("*");
         
         source.registerCorsConfiguration("/**", config);
